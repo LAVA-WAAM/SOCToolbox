@@ -1,161 +1,201 @@
-# Efficient SOC Toolbox / [SOC快速评测工具(中文Readme)](README_CN.md)
+# _Efficient SOC Toolbox_ & _LAVA-WAAM_
+## 1. Description
 
-## News:
+This repository is a fork of the [Efficient SOC Toolbox](https://github.com/mczhuge/SOCToolbox) and is provided as complementary material for the **LAVA-WAAM dataset**.
 
-🔥 [03/2022 New version code ensembled in ICON](https://github.com/mczhuge/ICON/tree/main/util/evaltool)
+It is designed to be used together with the pretrained and fine-tuned [DIS IS-Net](https://github.com/xuebinqin/DIS) models.
 
-🔥 **100 methods** SOC saliency maps can be found on [Here](https://drive.google.com/drive/folders/1E80KZiyEoxxR6lqe3x8SSar6gYYm9xkf)!
-
-
-## 1. Datasets and Training Setting
-
-Noted that, in our [ICON (arXiv, 2021）](https://arxiv.org/pdf/2101.07663.pdf), we use the following setting:
-
-- Using both train and val set of SOC to train our model.
-- Dropping out images without salient objects for training and testing.
-
-Thus, our Training and Testing set are 2400 and 600, respectively.  
-
-For a quick employment, you can download the updated SOC on [Baidu | Key: iqul ](https://pan.baidu.com/s/1kWebPUhCQOCsvvAouo7eGQ). 
-
-**If you download SOC on above link, you can ignore procedures below.**
-
-----
-
-(A) You can generates train.txt list which drops images without salient objects by
+The following scripts compute quantitative results for inference masks generated in “valid” mode using `IS-Net` (see the [II. Inference for datasets without ground truth](https://github.com/xuebinqin/DIS?tab=readme-ov-file#ii-inference-for-dataset-withwithout-ground-truth) section).
 
 
-```
-python ./Train/SOC/drop_blank_and_generate_list.py 
+## 2. Setup
+```bash
+# clone the repository
+git clone https://github.com/LAVA-WAAM/SOCToolbox.git
+cd SOCToolbox
+
+# create new env
+conda create -n soc_env python=3.11
+conda activate soc_env
+
+# install dependencies
+pip install -r requirements.txt
 ```
 
-(B) You can segment 8 attributes of testing set and their test.txt by
-
-```
-python ./Test/SOC/attr_categoty_and_generate_list.py 
-```
-
-Then 9 file folders will be generated, which are `./datasets/SOC/Test/SOC-AC`, `./datasets/SOC/Test/SOC-BO`, `./datasets/SOC/Test/SOC-CL`, `./datasets/SOC/Test/SOC-HO`, `./datasets/SOC/Test/SOC-MB`, `./datasets/SOC/Test/SOC-OC`, `./datasets/SOC/Test/SOC-OV`, `./datasets/SOC/Test/SOC-SC`, `./datasets/SOC/Test/SOC-SO`. They contain the images and GTs of each category. 
-
-**Actually, we have already processed A and B if you download SOC from above link.** (If needing, the original SOC dataset can be found [here](https://dpfan.net/socbenchmark/) and you can do A and B yourself.)
-
-## 2. Evaluation
-
-When your training process has done, you should generate the predictions of `SOC-AC`, `SOC-BO`, `SOC-CL`, `SOC-HO`, `SOC-MB`, `SOC-OC`, `SOC-OV`, `SOC-SC` and `SOC-SO`, respectively.
-
-When you have already generated all SOC-Test, an alternative method is to add `Attributes` files to prediction file, such as `Prediction/**Your_Method**/SOC/Attributes` then slightly modify the path in `Prediction/*Your_Method**/SOC/attr_categoty_and_generate_list.py` to automatively split your predicted saliency maps to 9 attributes.
-
-
-After that, you can evaluate your performance on SOC in ~2 minutes. 
-
-```
-sh run_eval.sh
+## 3. Repository structure
+```bash
+SOCToolbox(main)$ tree -L 2
+.
+├── LICENSE
+├── README.md
+├── reference_results
+│   ├── DIS
+│   └── LAVA_WAAM
+├── requirements.txt
+├── results
+└── run
+    ├── eval_DIS.py
+    ├── eval_DIS_VD.py
+    ├── eval_LAVA_WAAM.py
+    ├── show_ref_DIS.py
+    ├── show_ref_LAVA_WAAM_fine-tuned.py
+    ├── show_ref_LAVA_WAAM_pretrained.py
+    └── source
 ```
 
-## 3. Results by SOCToolbox
-The saliency maps of ICON can be found in [Baidu | Key:bopg](https://pan.baidu.com/s/19XV19I_0gfAjx2gwcweZcw).
+The main script for evaluating *pretrained* and *fine-tuned* models is `eval_LAVA_WAAM.py`.
 
-Tranined on DUTS, evaluated on SOC-Attr(9 attributes, 600 pics)
-```
-Method:ICON,Dataset:SOC,Attribute:SOC-AC||Smeasure:0.832; wFmeasure:0.767; MAE:0.066; adpEm:0.872; meanEm:0.885; maxEm:0.895; adpFm:0.782; meanFm:0.793; maxFm:0.814
-Method:ICON,Dataset:SOC,Attribute:SOC-BO||Smeasure:0.75; wFmeasure:0.841; MAE:0.166; adpEm:0.664; meanEm:0.784; maxEm:0.838; adpFm:0.833; meanFm:0.892; maxFm:0.914
-Method:ICON,Dataset:SOC,Attribute:SOC-CL||Smeasure:0.792; wFmeasure:0.733; MAE:0.113; adpEm:0.821; meanEm:0.828; maxEm:0.833; adpFm:0.762; meanFm:0.767; maxFm:0.777
-Method:ICON,Dataset:SOC,Attribute:SOC-HO||Smeasure:0.826; wFmeasure:0.763; MAE:0.091; adpEm:0.851; meanEm:0.854; maxEm:0.866; adpFm:0.788; meanFm:0.792; maxFm:0.815
-Method:ICON,Dataset:SOC,Attribute:SOC-MB||Smeasure:0.783; wFmeasure:0.697; MAE:0.095; adpEm:0.813; meanEm:0.821; maxEm:0.834; adpFm:0.729; meanFm:0.738; maxFm:0.76
-Method:ICON,Dataset:SOC,Attribute:SOC-OC||Smeasure:0.784; wFmeasure:0.704; MAE:0.103; adpEm:0.816; meanEm:0.821; maxEm:0.836; adpFm:0.739; meanFm:0.743; maxFm:0.765
-Method:ICON,Dataset:SOC,Attribute:SOC-OV||Smeasure:0.784; wFmeasure:0.75; MAE:0.117; adpEm:0.824; meanEm:0.833; maxEm:0.84; adpFm:0.789; meanFm:0.792; maxFm:0.806
-Method:ICON,Dataset:SOC,Attribute:SOC-SC||Smeasure:0.81; wFmeasure:0.721; MAE:0.079; adpEm:0.852; meanEm:0.856; maxEm:0.873; adpFm:0.728; meanFm:0.746; maxFm:0.782
-Method:ICON,Dataset:SOC,Attribute:SOC-SO||Smeasure:0.769; wFmeasure:0.643; MAE:0.087; adpEm:0.803; meanEm:0.809; maxEm:0.828; adpFm:0.662; meanFm:0.677; maxFm:0.71
+Additional scripts `eval_DIS.py` and `eval_DIS_VD.py` are provided to reproduce the `ISNet.pth` results from the original [publication](https://arxiv.org/pdf/2203.03041). These scripts validate our evaluation pipeline.
 
-```
 
-Tranined on DUTS, evaluated on SOC-Test(1200 pics)，又名S0C-1200。
-```
-Method:ICON,Dataset:SOC,Attribute:SOC-1200||Smeasure:0.811; wFmeasure:0.347; MAE:0.128; adpEm:0.812; meanEm:0.828; maxEm:0.896; adpFm:0.359; meanFm:0.363; maxFm:0.378
-```
+## 4. Metrics calculation
 
-Trained on SOC-Sal-Train_and_Val(2400 pics), evaluated on SOC-Attr(9 attributes, 600 pics).
-```
-Method:ICON,Dataset:SOC,Attribute:SOC-AC||Smeasure:0.84; wFmeasure:0.778; MAE:0.062; adpEm:0.89; meanEm:0.885; maxEm:0.894; adpFm:0.803; meanFm:0.806; maxFm:0.822
-Method:ICON,Dataset:SOC,Attribute:SOC-BO||Smeasure:0.7; wFmeasure:0.762; MAE:0.216; adpEm:0.599; meanEm:0.725; maxEm:0.787; adpFm:0.739; meanFm:0.811; maxFm:0.862
-Method:ICON,Dataset:SOC,Attribute:SOC-CL||Smeasure:0.845; wFmeasure:0.803; MAE:0.08; adpEm:0.874; meanEm:0.883; maxEm:0.893; adpFm:0.835; meanFm:0.834; maxFm:0.847
-Method:ICON,Dataset:SOC,Attribute:SOC-HO||Smeasure:0.841; wFmeasure:0.785; MAE:0.078; adpEm:0.873; meanEm:0.88; maxEm:0.892; adpFm:0.81; meanFm:0.815; maxFm:0.834
-Method:ICON,Dataset:SOC,Attribute:SOC-MB||Smeasure:0.82; wFmeasure:0.746; MAE:0.072; adpEm:0.846; meanEm:0.862; maxEm:0.87; adpFm:0.772; meanFm:0.781; maxFm:0.794
-Method:ICON,Dataset:SOC,Attribute:SOC-OC||Smeasure:0.813; wFmeasure:0.742; MAE:0.086; adpEm:0.847; meanEm:0.859; maxEm:0.873; adpFm:0.775; meanFm:0.78; maxFm:0.8
-Method:ICON,Dataset:SOC,Attribute:SOC-OV||Smeasure:0.826; wFmeasure:0.801; MAE:0.089; adpEm:0.86; meanEm:0.872; maxEm:0.88; adpFm:0.833; meanFm:0.833; maxFm:0.844
-Method:ICON,Dataset:SOC,Attribute:SOC-SC||Smeasure:0.834; wFmeasure:0.753; MAE:0.059; adpEm:0.895; meanEm:0.893; maxEm:0.906; adpFm:0.773; meanFm:0.779; maxFm:0.8
-Method:ICON,Dataset:SOC,Attribute:SOC-SO||Smeasure:0.816; wFmeasure:0.714; MAE:0.061; adpEm:0.869; meanEm:0.873; maxEm:0.884; adpFm:0.734; meanFm:0.745; maxFm:0.766
+0. **Generate inference results** (segmentation masks) using [DIS](https://github.com/xuebinqin/DIS?tab=readme-ov-file#ii-inference-for-dataset-withwithout-ground-truth).  
+1. **Run** `eval_LAVA_WAAM.py`, specifying the correct paths:
+   - `--data_dir DATA_DIR`: Path to the dataset directory.
+   - `--pred_dir PRED_DIR`: directory with inference results from step 1  
+2. **Compare** the results saved in `results/` against the `reference_results/`
+
+
+## 5. Usage
+```bash
+(soc_env) SOCToolbox$ python3 run/eval_LAVA_WAAM.py --help
+
+usage: eval_LAVA_WAAM.py [-h] [--data_dir DATA_DIR] [--pred_dir PRED_DIR]
+
+options:
+  -h, --help           show this help message and exit
+  --data_dir DATA_DIR  Path to the dataset directory.
+  --pred_dir PRED_DIR  Path to the predictions directory.
+
 ```
 
-Trained on SOC-Sal-Train(1800 pics), evaluated on SOC-Attr(9 attributes, 600 pics).
-```
-Method:ICON,Dataset:SOC,Attribute:SOC-AC||Smeasure:0.834; wFmeasure:0.774; MAE:0.067; adpEm:0.868; meanEm:0.891; maxEm:0.905; adpFm:0.781; meanFm:0.807; maxFm:0.827
-Method:ICON,Dataset:SOC,Attribute:SOC-BO||Smeasure:0.718; wFmeasure:0.78; MAE:0.203; adpEm:0.421; meanEm:0.746; maxEm:0.781; adpFm:0.58; meanFm:0.825; maxFm:0.847
-Method:ICON,Dataset:SOC,Attribute:SOC-CL||Smeasure:0.828; wFmeasure:0.774; MAE:0.092; adpEm:0.822; meanEm:0.868; maxEm:0.879; adpFm:0.778; meanFm:0.809; maxFm:0.827
-Method:ICON,Dataset:SOC,Attribute:SOC-HO||Smeasure:0.834; wFmeasure:0.769; MAE:0.085; adpEm:0.857; meanEm:0.868; maxEm:0.882; adpFm:0.793; meanFm:0.802; maxFm:0.822
-Method:ICON,Dataset:SOC,Attribute:SOC-MB||Smeasure:0.815; wFmeasure:0.746; MAE:0.079; adpEm:0.813; meanEm:0.853; maxEm:0.865; adpFm:0.754; meanFm:0.784; maxFm:0.808
-Method:ICON,Dataset:SOC,Attribute:SOC-OC||Smeasure:0.786; wFmeasure:0.7; MAE:0.097; adpEm:0.816; meanEm:0.84; maxEm:0.856; adpFm:0.73; meanFm:0.743; maxFm:0.765
-Method:ICON,Dataset:SOC,Attribute:SOC-OV||Smeasure:0.807; wFmeasure:0.769; MAE:0.103; adpEm:0.802; meanEm:0.851; maxEm:0.862; adpFm:0.779; meanFm:0.808; maxFm:0.822
-Method:ICON,Dataset:SOC,Attribute:SOC-SC||Smeasure:0.819; wFmeasure:0.73; MAE:0.068; adpEm:0.867; meanEm:0.884; maxEm:0.903; adpFm:0.736; meanFm:0.759; maxFm:0.797
-Method:ICON,Dataset:SOC,Attribute:SOC-SO||Smeasure:0.796; wFmeasure:0.675; MAE:0.071; adpEm:0.829; meanEm:0.848; maxEm:0.869; adpFm:0.69; meanFm:0.712; maxFm:0.745
+## 6. Default paths
+By default, we assume that `LAVA_WAAM` and `DIS5K` datasets are stored under `/home/docker/isnet_datasets/`.
+```bash
+$ ls /home/docker/isnet_datasets/
+DIS5K  LAVA_WAAM
 ```
 
-## 4. Others methods 
-Others 20 SOD methods on SOC dataset can be found on [baidu yun](https://pan.baidu.com/s/1eGGokt33eaZGsJ5n5VRt4Q) (code: z3fq): [DSS](https://openaccess.thecvf.com/content_cvpr_2017/papers/Hou_Deeply_Supervised_Salient_CVPR_2017_paper.pdf)、[NLDF](https://openaccess.thecvf.com/content_cvpr_2017/papers/Luo_Non-Local_Deep_Features_CVPR_2017_paper.pdf)、[SRM](https://openaccess.thecvf.com/content_ICCV_2017/papers/Wang_A_Stagewise_Refinement_ICCV_2017_paper.pdf)、[Amulet](https://openaccess.thecvf.com/content_ICCV_2017/papers/Zhang_Amulet_Aggregating_Multi-Level_ICCV_2017_paper.pdf)、[DGRL](https://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_Detect_Globally_Refine_CVPR_2018_paper.pdf)、[BMPM](https://openaccess.thecvf.com/content_cvpr_2018/papers_backup/Zhang_A_Bi-Directional_Message_CVPR_2018_paper.pdf)、[PiCANet-R](https://openaccess.thecvf.com/content_cvpr_2018/papers/Liu_PiCANet_Learning_Pixel-Wise_CVPR_2018_paper.pdf)、[R3Net](https://www.ijcai.org/Proceedings/2018/0095.pdf)、[C2S-Net](https://openaccess.thecvf.com/content_ECCV_2018/papers/Xin_Li_Contour_Knowledge_Transfer_ECCV_2018_paper.pdf)、[RANet](https://openaccess.thecvf.com/content_ECCV_2018/papers/Shuhan_Chen_Reverse_Attention_for_ECCV_2018_paper.pdf)、[CPD](https://openaccess.thecvf.com/content_CVPR_2019/papers/Wu_Cascaded_Partial_Decoder_for_Fast_and_Accurate_Salient_Object_Detection_CVPR_2019_paper.pdf)、[AFN](https://openaccess.thecvf.com/content_CVPR_2019/papers/Feng_Attentive_Feedback_Network_for_Boundary-Aware_Salient_Object_Detection_CVPR_2019_paper.pdf)、[BASNet](https://openaccess.thecvf.com/content_CVPR_2019/papers/Qin_BASNet_Boundary-Aware_Salient_Object_Detection_CVPR_2019_paper.pdf)、[PoolNet](https://openaccess.thecvf.com/content_CVPR_2019/papers/Liu_A_Simple_Pooling-Based_Design_for_Real-Time_Salient_Object_Detection_CVPR_2019_paper.pdf)、[SCRN](https://openaccess.thecvf.com/content_ICCV_2019/papers/Wu_Stacked_Cross_Refinement_Network_for_Edge-Aware_Salient_Object_Detection_ICCV_2019_paper.pdf)、[SIBA](https://openaccess.thecvf.com/content_ICCV_2019/papers/Su_Selectivity_or_Invariance_Boundary-Aware_Salient_Object_Detection_ICCV_2019_paper.pdf)、[EGNet](https://openaccess.thecvf.com/content_ICCV_2019/papers/Zhao_EGNet_Edge_Guidance_Network_for_Salient_Object_Detection_ICCV_2019_paper.pdf)、[F3Net](https://aaai.org/ojs/index.php/AAAI/article/view/6916)、[GCPANet](https://aaai.org/ojs/index.php/AAAI/article/view/6633)、[MINet](https://openaccess.thecvf.com/content_CVPR_2020/papers/Pang_Multi-Scale_Interactive_Network_for_Salient_Object_Detection_CVPR_2020_paper.pdf).
-
-If you want to re-evaluate these methods by using SOCToolbox, please add `Attributes` files to prediction file, such as `Prediction/MINet/SOC/Attributes` and  slightly modify the path in `Prediction/MINet/SOC/attr_categoty_and_generate_list.py` to automatively split 8 attributes.
-
-Comparison:
-
-![comp](comp.png) 
-
-## 5. Acknowledgement
-Some codes borrowed from:
-* <https://github.com/lartpang/PySODMetrics> 
-
-SOC results of other methods:
-* <https://github.com/wuzhe71/SCRN> 
-
-## Reference
-
-```text
-@inproceedings{fan2018salient,
-  title={Salient objects in clutter: Bringing salient object detection to the foreground},
-  author={Fan, Deng-Ping and Cheng, Ming-Ming and Liu, Jiang-Jiang and Gao, Shang-Hua and Hou, Qibin and Borji, Ali},
-  booktitle={Proceedings of the European conference on computer vision (ECCV)},
-  pages={186--202},
-  year={2018}
-}
-
-@inproceedings{Smeasure,
-    title={Structure-measure: A new way to evaluate foreground maps},
-    author={Fan, Deng-Ping and Cheng, Ming-Ming and Liu, Yun and Li, Tao and Borji, Ali},
-    booktitle=ICCV,
-    pages={4548--4557},
-    year={2017}
-}
-
-@inproceedings{Emeasure,
-    title="Enhanced-alignment Measure for Binary Foreground Map Evaluation",
-    author="Deng-Ping {Fan} and Cheng {Gong} and Yang {Cao} and Bo {Ren} and Ming-Ming {Cheng} and Ali {Borji}",
-    booktitle=IJCAI,
-    pages="698--704",
-    year={2018}
-}
-
-@inproceedings{margolin2014evaluate,
-  title={How to evaluate foreground maps?},
-  author={Margolin, Ran and Zelnik-Manor, Lihi and Tal, Ayellet},
-  booktitle={Proceedings of the IEEE conference on computer vision and pattern recognition},
-  pages={248--255},
-  year={2014}
-}
-
-@article{zhuge2021salient,
-  title={Salient Object Detection via Integrity Learning},
-  author={Zhuge, Mingchen and Fan, Deng-Ping and Liu, Nian and Zhang, Dingwen and Xu, Dong and Shao, Ling},
-  journal={arXiv preprint arXiv:2101.07663},
-  year={2021}
-}
+The default location for inference results (i.e. predicted masks) used for evaluation is: `/home/docker/inference_results_isnet/`
+```bash
+$ ls /home/docker/inference_results_isnet/
+DIS5K_isnet_pth  LAVA_WAAM_isnet_pth  LAVA_WAAM_fine-tuned_pth
 ```
+Recommended usage of the evaluation scripts:
+- Recreate the same directory structure (e.g. using symlinks), so default paths work out of the box;
+or
+- Explicitly pass the paths to `DATA_DIR` and `PRED_DIR` when running the evaluation scripts
+
+## 7. Results
+Evaluation results are printed to the console and saved in the `results/` directory.  
+Each run generates five tables: four detailed tables and one summary table.
+
+
+## 8. Reference results
+Reference results are stored in the `reference_results/` directory.  
+You can view them in Excel or run one of the available scripts:  
+  - `show_ref_LAVA_WAAM_pretrained.py`
+  - `show_ref_LAVA_WAAM_fine-tuned.py`
+  - `show_ref_DIS.py`
+
+
+```bash
+(soc_env) SOCToolbox(main)$ python3 run/show_ref_results/show_ref_LAVA_WAAM_pretrained.py
+
+20251008_214205_detailed_S-1.csv:
+┍━━━━━┯━━━━━━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset        │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ E3_S4_C1_P2_6 │   0.181 │       0.010 │ 0.145 │      0.427 │    0.252 │
+│ 2   │ E5_S7_C0_P13  │   0.258 │       0.007 │ 0.212 │      0.394 │    0.251 │
+│ 3   │ E5_S7_C0_P14  │   0.247 │       0.007 │ 0.202 │      0.398 │    0.251 │
+│ 4   │ E5_S8_C0_P1   │   0.319 │       0.006 │ 0.265 │      0.367 │    0.251 │
+│ 5   │ E5_S10_C0_P8  │   0.223 │       0.006 │ 0.181 │      0.409 │    0.251 │
+┝━━━━━┿━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average:      │   0.246 │       0.007 │ 0.201 │      0.399 │    0.251 │
+┕━━━━━┷━━━━━━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙
+
+
+20251008_214205_detailed_S-2.csv:
+┍━━━━━┯━━━━━━━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset         │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ E3_S5_C2_P0    │   0.304 │       0.175 │ 0.065 │      0.527 │    0.400 │
+│ 2   │ E3_S5_C2_P5    │   0.177 │       0.011 │ 0.142 │      0.428 │    0.252 │
+│ 3   │ E4_S6_C0_P2_12 │   0.923 │       0.763 │ 0.041 │      0.810 │    0.852 │
+│ 4   │ E4_S6_C0_P3    │   0.186 │       0.008 │ 0.149 │      0.425 │    0.251 │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average:       │   0.397 │       0.239 │ 0.099 │      0.547 │    0.439 │
+┕━━━━━┷━━━━━━━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙
+
+
+20251008_214205_detailed_S-3.csv:
+┍━━━━━┯━━━━━━━━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset          │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ E5_S9_C1_P7     │   0.518 │       0.122 │ 0.261 │      0.408 │    0.328 │
+│ 2   │ E5_S9_C1_P16    │   0.276 │       0.007 │ 0.228 │      0.385 │    0.255 │
+│ 3   │ E5_S9_C1_P19    │   0.253 │       0.007 │ 0.207 │      0.396 │    0.252 │
+│ 4   │ E5_S11_C2_P5    │   0.210 │       0.005 │ 0.178 │      0.406 │    0.277 │
+│ 5   │ E5_S11_C2_P10_1 │   0.269 │       0.005 │ 0.222 │      0.388 │    0.251 │
+│ 6   │ E5_S11_C2_P11   │   0.352 │       0.005 │ 0.295 │      0.352 │    0.251 │
+┝━━━━━┿━━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average:        │   0.313 │       0.025 │ 0.232 │      0.389 │    0.269 │
+┕━━━━━┷━━━━━━━━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙
+
+
+20251008_214205_detailed_S-4.csv:
+┍━━━━━┯━━━━━━━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset         │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ E6_S12_T1_A1_4 │   0.214 │       0.007 │ 0.173 │      0.413 │    0.251 │
+│ 2   │ E6_S12_T1_A1_6 │   0.226 │       0.012 │ 0.184 │      0.408 │    0.254 │
+│ 3   │ E6_S12_T1_B2_3 │   0.150 │       0.008 │ 0.120 │      0.439 │    0.252 │
+│ 4   │ E6_S12_T1_B2_5 │   0.147 │       0.008 │ 0.117 │      0.440 │    0.252 │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average:       │   0.184 │       0.009 │ 0.148 │      0.425 │    0.252 │
+┕━━━━━┷━━━━━━━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙
+
+
+20251008_214205_detailed_S-5.csv:
+┍━━━━━┯━━━━━━━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset         │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ E6_S14_C2_V4   │   0.260 │       0.007 │ 0.213 │      0.393 │    0.251 │
+│ 2   │ E6_S14_C2_V6_3 │   0.213 │       0.008 │ 0.173 │      0.413 │    0.251 │
+│ 3   │ E6_S14_C2_V7_1 │   0.219 │       0.008 │ 0.177 │      0.411 │    0.251 │
+│ 4   │ E6_S15_C3_V2_0 │   0.255 │       0.007 │ 0.209 │      0.395 │    0.251 │
+│ 5   │ E6_S15_C3_V2_1 │   0.243 │       0.007 │ 0.198 │      0.400 │    0.251 │
+│ 6   │ E6_S15_C3_V2_6 │   0.237 │       0.007 │ 0.193 │      0.403 │    0.251 │
+┝━━━━━┿━━━━━━━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average:       │   0.238 │       0.008 │ 0.194 │      0.402 │    0.251 │
+┕━━━━━┷━━━━━━━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙
+
+
+20251008_214205_summary.csv:
+┍━━━━━┯━━━━━━━━━━┯━━━━━━━━━┯━━━━━━━━━━━━━┯━━━━━━━┯━━━━━━━━━━━━┯━━━━━━━━━━┑
+│ N   │ Subset   │   maxFm │   wFmeasure │   MAE │   Smeasure │   meanEm │
+┝━━━━━┿━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│ 1   │ S-1      │   0.246 │       0.007 │ 0.201 │      0.399 │    0.251 │
+│ 2   │ S-2      │   0.397 │       0.239 │ 0.099 │      0.547 │    0.439 │
+│ 3   │ S-3      │   0.313 │       0.025 │ 0.232 │      0.389 │    0.269 │
+│ 4   │ S-4      │   0.184 │       0.009 │ 0.148 │      0.425 │    0.252 │
+│ 5   │ S-5      │   0.238 │       0.008 │ 0.194 │      0.402 │    0.251 │
+┝━━━━━┿━━━━━━━━━━┿━━━━━━━━━┿━━━━━━━━━━━━━┿━━━━━━━┿━━━━━━━━━━━━┿━━━━━━━━━━┥
+│     │ Average: │   0.276 │       0.058 │ 0.175 │      0.433 │    0.292 │
+┕━━━━━┷━━━━━━━━━━┷━━━━━━━━━┷━━━━━━━━━━━━━┷━━━━━━━┷━━━━━━━━━━━━┷━━━━━━━━━━┙```
+
+```bash
+(soc_env) SOCToolbox(main)$ python3 run/show_ref_LAVA_WAAM_fine-tuned.py 
+# ...
+```
+
+## 9. Acknowledgements
+
+We thank the following open-source projects for their contributions:
+
+- [SOCToolbox](https://github.com/mczhuge/SOCToolbox)  
+- [PySODMetrics](https://github.com/lartpang/PySODMetrics)  
+- [SCRN](https://github.com/wuzhe71/SCRN)  
 
