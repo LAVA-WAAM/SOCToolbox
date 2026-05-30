@@ -7,40 +7,46 @@ from source.eval_details import eval_multiple_subsets
 def eval_LAVA_WAAM(data_root: Path, pred_root: Path) -> None:
     data_dirs = {
         "S-1": [
-            # oxidation
-            data_root / "E3_S4_C1/E3_S4_C1_P2_6",
-            data_root / "E5_S7_C0/E5_S7_C0_P13",
-            data_root / "E5_S7_C0/E5_S7_C0_P14",
-            data_root / "E5_S8_C0/E5_S8_C0_P1",
-            data_root / "E5_S10_C0/E5_S10_C0_P8",
+            data_root / "E2_S3_W1/E2_S3_W1_L1",
+            data_root / "E2_S3_W1/E2_S3_W1_L2",
+            data_root / "E2_S3_W1/E2_S3_W1_L3",
+            data_root / "E2_S3_W1/E2_S3_W1_L4",
+            data_root / "E2_S3_W1/E2_S3_W1_L5",
+            data_root / "E2_S3_W1/E2_S3_W1_L9",
+            data_root / "E2_S3_W1/E2_S3_W1_L13",
+            data_root / "E2_S3_W1/E2_S3_W1_L15",
         ],
         "S-2": [
             data_root / "E3_S5_C2/E3_S5_C2_P0",
+            data_root / "E3_S5_C2/E3_S5_C2_P1",
+            data_root / "E3_S5_C2/E3_S5_C2_P2",
+            data_root / "E3_S5_C2/E3_S5_C2_P3",
+            data_root / "E3_S5_C2/E3_S5_C2_P4",
             data_root / "E3_S5_C2/E3_S5_C2_P5",
-            data_root / "E4_S6_C0/E4_S6_C0_P2_12",
-            data_root / "E4_S6_C0/E4_S6_C0_P3",
+            data_root / "E3_S5_C2/E3_S5_C2_P6",
+            data_root / "E3_S5_C2/E3_S5_C2_P7",
+            data_root / "E3_S5_C2/E3_S5_C2_P8",
         ],
         "S-3": [
-            data_root / "E5_S9_C1/E5_S9_C1_P7",
-            data_root / "E5_S9_C1/E5_S9_C1_P16",
-            data_root / "E5_S9_C1/E5_S9_C1_P19",
-            data_root / "E5_S11_C2/E5_S11_C2_P5",
-            data_root / "E5_S11_C2/E5_S11_C2_P10_1",
-            data_root / "E5_S11_C2/E5_S11_C2_P11",
+            data_root / "E5_S8_C0/E5_S8_C0_P1",
+            data_root / "E5_S8_C0/E5_S8_C0_P5",
+            data_root / "E5_S8_C0/E5_S8_C0_P6",
         ],
         "S-4": [
-            data_root / "E6_S12_T1/E6_S12_T1_A1_4",
-            data_root / "E6_S12_T1/E6_S12_T1_A1_6",
-            data_root / "E6_S12_T1/E6_S12_T1_B2_3",
-            data_root / "E6_S12_T1/E6_S12_T1_B2_5",
+            data_root / "E5_S9_C1/E5_S9_C1_P2",
+            data_root / "E5_S9_C1/E5_S9_C1_P3",
+            data_root / "E5_S9_C1/E5_S9_C1_P4",
+            data_root / "E5_S9_C1/E5_S9_C1_P7",
+            data_root / "E5_S9_C1/E5_S9_C1_P10",
+            data_root / "E5_S9_C1/E5_S9_C1_P13",
+            data_root / "E5_S9_C1/E5_S9_C1_P14",
+            data_root / "E5_S9_C1/E5_S9_C1_P16",
+            data_root / "E5_S9_C1/E5_S9_C1_P19",
+            data_root / "E5_S9_C1/E5_S9_C1_P25",
         ],
         "S-5": [
-            data_root / "E6_S14_C2/E6_S14_C2_V4",
-            data_root / "E6_S14_C2/E6_S14_C2_V6_3",
-            data_root / "E6_S14_C2/E6_S14_C2_V7_1",
-            data_root / "E6_S15_C3/E6_S15_C3_V2_0",
-            data_root / "E6_S15_C3/E6_S15_C3_V2_1",
-            data_root / "E6_S15_C3/E6_S15_C3_V2_6",
+            data_root / "E6_S13_C1/E6_S13_C1_V1_9",
+            data_root / "E6_S13_C1/E6_S13_C1_V1_10",
         ],
     }
 
@@ -57,7 +63,7 @@ if __name__ == "__main__":
     pred_dir = "/home/docker/inference_results_isnet/LAVA_WAAM_isnet_pth/"
 
     # LAVA_WAAM - fine-tuned_pth:
-    # gt_dir = "/home/docker/isnet_datasets/LAVA_WAAM/"
+    # data_dir = "/home/docker/isnet_datasets/LAVA_WAAM/"
     # pred_dir = "/home/docker/inference_results_isnet/LAVA_WAAM_fine-tuned_pth/"
 
     parser = argparse.ArgumentParser()
